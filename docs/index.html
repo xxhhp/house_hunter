@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>House Hunter</title>
+<meta name="description" content="Addresses, public-records reports and a shared map for house hunting.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="map" aria-label="Map of saved addresses"></div>
+<p class="notice" id="notice" role="status"></p>
+
+<header class="top">
+  <div class="brand"><h1>House Hunter</h1></div>
+  <div class="crew">
+    <button class="persona-chip" id="personaChip" type="button" hidden
+            title="Switch who you are">—</button>
+    <button class="iconbtn" id="shareBtn" title="Share list" aria-label="Share list" disabled>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+    </button>
+  </div>
+</header>
+
+<form class="search" id="addForm" autocomplete="off">
+  <div id="acHost" class="ac-host"></div>
+  <div class="searchbox fallback">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" class="mag" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+    <input id="addressInput" type="text" placeholder="Enter an address" aria-label="Enter an address">
+    <button class="go" type="submit">Add</button>
+  </div>
+</form>
+
+<section class="report" id="report" aria-live="polite" aria-label="Address report">
+  <div class="rhead">
+    <div class="rtop">
+      <div class="rtitle">
+        <h2 id="reportTitle">—</h2>
+        <p class="rmeta" id="reportMeta"></p>
+      </div>
+      <div class="racts">
+        <div class="hearts" id="reportHearts"></div>
+        <button class="iconbtn flat" id="reportClose" type="button" aria-label="Close report">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="reportBanner"></div>
+  </div>
+  <div class="rbody" id="reportBody"></div>
+  <div class="rfoot">
+    <button class="btn grow" id="reportRerun" type="button">Run analysis</button>
+    <button class="btn danger" id="reportDelete" type="button">Remove</button>
+  </div>
+</section>
+
+<section class="drawer" id="drawer" aria-label="Saved addresses">
+  <button class="handle" id="drawerHandle" type="button" aria-expanded="false" aria-controls="rows">
+    <span class="count" id="count">0 places</span>
+    <span class="status" id="status">Saved</span>
+    <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
+  </button>
+  <div class="rows" id="rows"></div>
+</section>
+
+<div class="toast" id="toast" role="status">
+  <span id="toastMsg"></span>
+  <button id="toastAction" type="button" hidden>Undo</button>
+</div>
+
+<div class="entry" id="entry" hidden></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
