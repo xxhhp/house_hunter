@@ -1,6 +1,6 @@
 import { CONFIG } from './config.js';
 import { createStore } from './store.js';
-import { createMap, mountAutocomplete } from './map.js';
+import { createMap, mountAutocomplete, availableBasemaps, loadBasemapChoice } from './map.js';
 import { analyzeAddress } from './analyzer.js';
 import { createList, createReport, createToast, createEntry } from './ui.js';
 import { PERSONAS, byId, loadPersona, savePersona } from './personas.js';
@@ -232,6 +232,51 @@ $('addForm').addEventListener('submit', async e => {
   input.value = '';
 });
 
+/* ----------------------------- map style ---------------------------- */
+
+function buildStyleMenu() {
+  const menu = $('styleMenu');
+  const btn = $('styleBtn');
+  btn.hidden = false;
+
+  const paint = () => {
+    const current = loadBasemapChoice();
+    menu.textContent = '';
+    for (const b of availableBasemaps()) {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.setAttribute('aria-current', String(b.id === current));
+      const l = document.createElement('span');
+      l.className = 'sl';
+      l.textContent = b.label;
+      const n = document.createElement('span');
+      n.className = 'sn';
+      n.textContent = b.note;
+      item.append(l, n);
+      item.addEventListener('click', () => {
+        map.setBasemap(b.id);
+        paint();
+        menu.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      menu.appendChild(item);
+    }
+  };
+  paint();
+
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    menu.hidden = !menu.hidden;
+    btn.setAttribute('aria-expanded', String(!menu.hidden));
+  });
+  document.addEventListener('click', e => {
+    if (!menu.hidden && !menu.contains(e.target)) {
+      menu.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
 /* -------------------------------- boot ------------------------------ */
 
 (async function boot() {
@@ -244,6 +289,7 @@ $('addForm').addEventListener('submit', async e => {
     map.onSelect(id => select(id));
     map.onBackgroundClick(close);
     if (map.degraded) $('notice').textContent = map.degraded;
+    if (map.setBasemap) buildStyleMenu();
 
     const ac = await mountAutocomplete($('acHost'), geocoded => addPlace(geocoded));
     if (ac) $('addForm').classList.add('has-autocomplete');

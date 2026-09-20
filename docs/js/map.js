@@ -1,4 +1,4 @@
-import { CONFIG } from './config.js';
+import { CONFIG, BASEMAPS } from './config.js';
 import { likers } from './model.js';
 import { PERSONAS } from './personas.js';
 
@@ -103,6 +103,37 @@ function loadOnce(tag, attrs) {
   });
 }
 
+/** Basemaps the user can actually use right now. */
+export function availableBasemaps() {
+  return BASEMAPS.filter(b => !b.needsCartoKey || CONFIG.CARTO_API_KEY);
+}
+
+const BASEMAP_KEY = 'house-hunter.basemap';
+
+export function loadBasemapChoice() {
+  try {
+    const saved = localStorage.getItem(BASEMAP_KEY);
+    if (saved && availableBasemaps().some(b => b.id === saved)) return saved;
+  } catch { /* storage off */ }
+  return availableBasemaps().some(b => b.id === CONFIG.DEFAULT_BASEMAP)
+    ? CONFIG.DEFAULT_BASEMAP
+    : availableBasemaps()[0].id;
+}
+
+export function saveBasemapChoice(id) {
+  try { localStorage.setItem(BASEMAP_KEY, id); } catch { /* storage off */ }
+}
+
+const prefersDark = () =>
+  window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+
+function tileUrl(raw) {
+  if (!raw) return null;
+  return CONFIG.CARTO_API_KEY && raw.includes('cartocdn.com')
+    ? raw + '?key=' + encodeURIComponent(CONFIG.CARTO_API_KEY)
+    : raw;
+}
+
 async function leafletMap(el) {
   await loadOnce('link', {
     rel: 'stylesheet',
@@ -115,10 +146,37 @@ async function leafletMap(el) {
   const map = L.map(el, { zoomControl: false, attributionControl: true })
     .setView([CONFIG.DEFAULT_CENTER.lat, CONFIG.DEFAULT_CENTER.lng], CONFIG.DEFAULT_ZOOM);
 
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
+  let baseLayer = null;
+  let labelLayer = null;
+
+  function applyBasemap(id) {
+    const spec = BASEMAPS.find(b => b.id === id) || BASEMAPS[0];
+    const variant = prefersDark() && spec.dark ? { ...spec, ...spec.dark } : spec;
+
+    baseLayer?.remove();
+    labelLayer?.remove();
+    labelLayer = null;
+
+    baseLayer = L.tileLayer(tileUrl(variant.url), {
+      maxZoom: 19,
+      detectRetina: true,
+      attribution: spec.attribution
+    }).addTo(map);
+
+    if (variant.overlay) {
+      labelLayer = L.tileLayer(tileUrl(variant.overlay), {
+        maxZoom: 19,
+        detectRetina: true,
+        pane: 'shadowPane'   // above tiles, below markers
+      }).addTo(map);
+    }
+  }
+
+  applyBasemap(loadBasemapChoice());
+
+  // Follow the system theme if it flips while the page is open.
+  window.matchMedia?.('(prefers-color-scheme: dark)')
+    .addEventListener?.('change', () => applyBasemap(loadBasemapChoice()));
 
   let markers = [];
   let onSelect = () => {};
@@ -146,6 +204,7 @@ async function leafletMap(el) {
     focus(lat, lng) {
       map.panTo([lat, lng], { animate: true });
     },
+    setBasemap(id) { saveBasemapChoice(id); applyBasemap(id); },
     onSelect(fn) { onSelect = fn; },
     onBackgroundClick(fn) { onBg = fn; }
   };

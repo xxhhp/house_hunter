@@ -61,6 +61,29 @@ Autocomplete uses `PlaceAutocompleteElement` and the `gmp-select` event, biased
 to a South Bay box set in `config.js`. Every address picked from autocomplete
 carries a `placeId`, which is the first layer of the dedup check.
 
+## Map style
+
+The layers button in the header switches the basemap, and the choice sticks.
+
+| Style | Setup |
+|---|---|
+| Soft grey | None. Esri's grey canvas, labels drawn on top. The default. |
+| Near white | Needs a free CARTO key |
+| Near white, no text | Needs a free CARTO key |
+| OpenStreetMap | None. The colourful original. |
+
+The two CARTO styles stay hidden until a key exists. Get one at
+carto.com/basemaps/apikey — free, no account, one minute — and paste it into
+`CARTO_API_KEY` in `docs/js/config.js`. Without a key CARTO now stamps every
+tile with a watermark, which is why they are hidden rather than broken.
+
+Every style has a dark variant, picked automatically from your system theme.
+
+Once you move to Google Maps this picker disappears, because Google styles its
+maps a different way: the look is attached to the Map ID in the Cloud console
+rather than chosen in the page. Pick the look you want here first and the
+equivalent Google style can be set up to match.
+
 ## The two people
 
 The app opens on a chooser: **绝世大帅哥** in pink, **睿智大机智** in blue. The

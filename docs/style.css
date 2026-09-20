@@ -59,6 +59,20 @@ h1,h2,h3,p{margin:0}
 .pin.sel:not(.liked) .body{fill:var(--apricot)}
 .pin.sel:not(.liked) .dot{fill:var(--apricot-ink)}
 
+/* map style menu */
+.stylemenu{position:fixed;top:calc(env(safe-area-inset-top,0px) + 58px);right:16px;z-index:660;
+           width:min(250px,calc(100% - 32px));background:var(--panel);border:1px solid var(--line);
+           border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.stylemenu[hidden]{display:none}
+.stylemenu button{display:block;width:100%;text-align:left;padding:11px 14px;
+                  border-bottom:1px solid var(--line)}
+.stylemenu button:last-child{border-bottom:0}
+.stylemenu button:hover{background:var(--panel-2)}
+.stylemenu .sl{display:block;font-size:14px}
+.stylemenu .sn{display:block;font-size:12px;color:var(--ink-soft)}
+.stylemenu button[aria-current="true"] .sl{font-weight:600}
+.stylemenu button[aria-current="true"]{background:var(--panel-2)}
+
 /* notice */
 .notice{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 118px);
         max-width:min(420px,calc(100% - 32px));z-index:640;text-align:center;
